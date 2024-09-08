@@ -36,6 +36,7 @@ class NaiveBayes:
         # return class with the highest posterior
         return self._classes[np.argmax(posteriors)]
 
+    # calculate probability distribution (using gaussian distribution)
     def _pdf(self, class_index, x):
         mean = self._mean[class_index]
         var = self._var[class_index]
@@ -43,6 +44,7 @@ class NaiveBayes:
         denominator = np.sqrt(2 * np.pi * var)
         return numerator / denominator
 
+    # calculate accuracy of algorithm compared to known results
     def accuracy(y_true, y_pred):
         accuracy = np.sum(y_true == y_pred) / len(y_true)
         return accuracy
