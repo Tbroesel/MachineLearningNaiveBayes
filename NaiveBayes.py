@@ -40,8 +40,8 @@ class NaiveBayes:
     def _pdf(self, class_index, x):
         mean = self._mean[class_index]
         var = self._var[class_index]
-        numerator = np.exp(-((x - mean) ** 2) / (2 * var))
-        denominator = np.sqrt(2 * np.pi * var)
+        numerator = np.exp(-((x - mean) ** 2) / (2 * (var ** 2)))
+        denominator = np.sqrt(2 * np.pi) * var
         return numerator / denominator
 
     # calculate accuracy of algorithm compared to known results
