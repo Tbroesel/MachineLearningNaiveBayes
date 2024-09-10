@@ -45,7 +45,7 @@ class NaiveBayes:
         return numerator / denominator
 
     # calculate accuracy of algorithm compared to known results
-    def accuracy(y_true, y_pred):
+    def accuracy(self,y_true, y_pred):
         accuracy = np.sum(y_true == y_pred) / len(y_true)
         return accuracy
 
