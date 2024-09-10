@@ -5,8 +5,8 @@ import DataPreProcessing as dpp
 
 Naive = nb.NaiveBayes()
 
-print("\n"*3,"~*"*7, "Naive~Bayes~Algorithim", "~*"*7)
-fileLocationInput = input(R"\n**Enter File Location of Data: ") 
+print("\n"*3,"~*"*7, "Naive~Bayes~Algorithim", "~*"*7,"\n")
+fileLocationInput = input(R"**Enter File Location of Data: ") 
 #fileLocationInput = R"C:\Users\tyler\OneDrive\Documents\Python\Data\abalone.data" #Just used for ease of testing code
 dataProcess = dpp.processData(fileLocationInput)
 
@@ -20,6 +20,6 @@ Naive.fit(X_Train, Y_Train)
 
 predictions = Naive.predict(X_Test)
 
-accuracy = Naive.accuracy(Y_Test,predictions)
+accuracy = Naive.accuracy(Y_Test, predictions)
 
 print("Accuracy of Naive Bayes: ", accuracy)
