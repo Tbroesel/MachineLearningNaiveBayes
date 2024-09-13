@@ -13,11 +13,7 @@ fileLocationInput = input(R"Enter File Location of Data: ")
 
 
 # get raw data from dataset
-dataRaw = pd.read_csv(fileLocationInput)
-#print(dataRaw)
-
-# create training data set with subset of dataRaw
-
+dataRaw = pd.read_csv(fileLocationInput, header = None)
 
 # process training data
 X, y = processData.trainPreProcess(dataRaw)
@@ -26,6 +22,7 @@ X, y = processData.trainPreProcess(dataRaw)
 # fit training data
 Naive.fit(X, y)
 
+# process test data
 X, y = processData.testPreProcess(dataRaw)
 
 
