@@ -1,13 +1,12 @@
-#Local Files
+
 import NaiveBayes as nb
 import DataPreProcessing as dpp
 
 
 Naive = nb.NaiveBayes()
 
-print("\n"*3,"~*"*7, "Naive~Bayes~Algorithim", "~*"*7,"\n")
-fileLocationInput = input(R"**Enter File Location of Data: ") 
-#fileLocationInput = R"C:\Users\tyler\OneDrive\Documents\Python\Data\abalone.data" #Just used for ease of testing code
+print("\n"*3,"~*"*7, "Naive~Bayes~Algorithim", "~*"*7)
+fileLocationInput = input(R"\n**Enter File Location of Data: ")
 dataProcess = dpp.processData(fileLocationInput)
 
 print("\n"*2,"~~~~~Data Settings~~~~~\n")
