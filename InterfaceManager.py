@@ -6,12 +6,14 @@ import DataPreProcessing as dpp
 Naive = nb.NaiveBayes()
 
 print("\n"*3,"~*"*7, "Naive~Bayes~Algorithim", "~*"*7)
-fileLocationInput = input(R"\n**Enter File Location of Data: ")
+fileLocationInput = input(R"**Enter File Location of Data: ")
+print()
 dataProcess = dpp.processData(fileLocationInput)
 
 print("\n"*2,"~~~~~Data Settings~~~~~\n")
 splitPercent = int(input("**What percent of the data do you want to be testing data: "))
-noise = bool(input("\n**Do you want to add noise(Leave empty for false): "))
+print()
+noise = bool(input("**Do you want to add noise(Leave empty for false): "))
 
 X_Train, X_Test, Y_Train, Y_Test = dataProcess.getData(splitPercent,noise)
 
