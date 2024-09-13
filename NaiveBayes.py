@@ -1,51 +1,109 @@
+
+
 import numpy as np
 
 
 class NaiveBayes:
 
+
+    def __init__(self):
+
+        self.features = list
+        self.likelihoods = {}
+        self.class_priors = {}
+        self.pred_priors = {}
+
+        self.X_train = np.array
+        self.y_train = np.array
+        self.train_size = int
+        self.num_features = int
+
+
     def fit(self, X, y):
-        sample_count, feature_count = X.shape
-        self._classes = np.unique(y)
-        classes_count = len(self._classes)
+        self.features = list(X.columns)
+        self.X_train = X
+        self.y_train = y
+        self.train_size = X.shape[0]
+        self.num_features = X.shape[1]
 
-        # calculate mean, variance, and prior for each class
-        self._mean = np.zeros((classes_count, feature_count), dtype=np.float64)
-        self._var = np.zeros((classes_count, feature_count), dtype=np.float64)
-        self._priors = np.zeros(classes_count, dtype=np.float64)
+        for feature in self.features:
+            self.likelihoods[feature] = {}
+            self.pred_priors[feature] = {}
 
-        for i, c in enumerate(self._classes):
-            X_c = X[y == c]
-            self._mean[i, :] = X_c.mean(axis=0)
-            self._var[i, :] = X_c.var(axis=0)
-            self._priors[i] = X_c.shape[0] / float(sample_count)
+            for feature_value in np.unique(self.X_train[feature]):
+                self.pred_priors[feature].update({feature_value: 0})
+
+                for outcome in np.unique(self.y_train):
+                    self.likelihoods[feature].update({feature_value + '_' + outcome: 0})
+                    self.class_priors.update({outcome: 0})
+
+        self._calc_class_prior()
+        self._calc_likelihoods()
+        self._calc_predictor_prior()
+
+
+    def _calc_class_prior(self):
+        for outcome in np.unique(self.y_train):
+            outcome_count = sum(self.y_train == outcome)
+            self.class_priors[outcome] = outcome_count / self.train_size
+
+
+    def _calc_likelihoods(self):
+        for feature in self.features:
+            for outcome in np.unique(self.y_train):
+                outcome_count = sum(self.y_train == outcome)
+                feat_likelihood = self.X_train[feature][self.y_train[self.y_train == outcome].index.values.tolist()].value_counts().to_dict()
+
+                for feature_value, count in feat_likelihood.items():
+                    self.likelihoods[feature][feature_value + '_' + outcome] = count / outcome_count
+
+
+    def _calc_predictor_prior(self):
+        for feature in self.features:
+            feature_values = self.X_train[feature].value_counts().to_dict()
+            for feature_value, count in feature_values.items():
+                self.pred_priors[feature][feature_value] = count / self.train_size
+
 
     def predict(self, X):
-        y_pred = [self._predict(x) for x in X]
-        return np.array(y_pred)
+        results = []
+        X = np.array(X)
 
-    def _predict(self, x):
-        posteriors = []
+        for query in X:
+            probabilities_outcome = {}
+            for outcome in np.unique(self.y_train):
+                prior = self.class_priors[outcome]
+                likelihood = 1
+                evidence = 1
 
-        # calculate posterior probability for each class
-        for i, c in enumerate(self._classes):
-            prior = np.log(self._priors[i])
-            posterior = np.sum(np.log(self._pdf(i, x)))
-            posterior = posterior + prior
-            posteriors.append(posterior)
+                for feat, feature_value in zip(self.features, query):
+                    likelihood *= self.likelihoods[feat][feature_value]
+                    evidence *= self.pred_priors[feat][feature_value]
 
-        # return class with the highest posterior
-        return self._classes[np.argmax(posteriors)]
+                posterior = (likelihood * prior) / evidence
+                probabilities_outcome[outcome] = posterior
 
-    # calculate probability distribution (using gaussian distribution)
-    def _pdf(self, class_index, x):
-        mean = self._mean[class_index]
-        var = self._var[class_index]
-        numerator = np.exp(-((x - mean) ** 2) / (2 * (var ** 2)))
-        denominator = np.sqrt(2 * np.pi) * var
-        return numerator / denominator
+            result = max(probabilities_outcome, key = lambda x: probabilities_outcome[x])
+            results.append(result)
+
+        return np.array(results)
+
 
     # calculate accuracy of algorithm compared to known results
-    def accuracy(self,y_true, y_pred):
-        accuracy = np.sum(y_true == y_pred) / len(y_true)
-        return accuracy
+    def accuracy(self, y_true, y_pred):
+        return float(sum(y_pred == y_true))/float(len(y_true)) * 100
 
+
+    # calculate precision score
+    def precision(self, y_true, y_pred):
+        return float(sum(y_pred == y_true) / (sum(y_pred == y_true) + sum(y_pred != y_true)))
+
+
+    # calculate recall score
+    def recall(self, y_true, y_pred):
+        return float(sum(y_pred == y_true) / (sum(y_pred == y_true) + sum(y_true != y_pred)))
+
+
+    # calculate f1 score
+    def f1_score(self, y_true, y_pred):
+        return float(2 * ((self.precision(y_true, y_pred) * self.recall(y_true, y_pred)) / (self.precision(y_true, y_pred) + self.recall(y_true, y_pred))))

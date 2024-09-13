@@ -1,27 +1,16 @@
 import numpy as np
 import pandas as pd
-import random
+import matplotlib.pyplot as plt
+import math
 
 class processData:
 
-    def __init__(self, DataFileLocation):
-        self.DataFileLocation = DataFileLocation
+    def preProcess(dat):
 
-        dataRaw = pd.read_csv(DataFileLocation, header=None, delimiter=",")
+        X = dat.drop([dat.columns[-1]], axis = 1)
+        y = dat[dat.columns[-1]]
 
-        self.dataNumpy = dataRaw.to_numpy()
-        
-
-         #Shuffle the data
-        np.random.shuffle(self.dataNumpy)
-
-        #Y data is one dimensional array that has the 'results' i.e. the thing we are trying to 'guess' [last column]
-        self.Y_Data = self.dataNumpy[:,-1]
-        #X_Data saves all the data except the 'results' we will use this to see of we can guess the results with this
-        self.X_Data = self.dataNumpy[:, :-1]
-
-        numRows, numColumns = self.dataNumpy.shape
-
+        return X, y
         
 
     def getData(self, split = 30, noise = False):
