@@ -28,18 +28,13 @@ class NaiveBayes:
 
         for feature in self.features:
             self.likelihoods[feature] = {}
-            self.pred_priors[feature] = {}
 
-            for feature_value in np.unique(self.X_train[feature]):
-                self.pred_priors[feature].update({feature_value: 0})
-
-                for outcome in np.unique(self.y_train):
-                    self.likelihoods[feature].update({feature_value + '_' + outcome: 0})
-                    self.class_priors.update({outcome: 0})
+            for outcome in np.unique(self.y_train):
+                self.likelihoods[feature].update({outcome:{}})
+                self.class_priors.update({outcome: 0})
 
         self._calc_class_prior()
         self._calc_likelihoods()
-        self._calc_predictor_prior()
 
 
     def _calc_class_prior(self):
@@ -50,12 +45,10 @@ class NaiveBayes:
 
     def _calc_likelihoods(self):
         for feature in self.features:
-            for outcome in np.unique(self.y_train):
-                outcome_count = sum(self.y_train == outcome)
-                feat_likelihood = self.X_train[feature][self.y_train[self.y_train == outcome].index.values.tolist()].value_counts().to_dict()
 
-                for feature_value, count in feat_likelihood.items():
-                    self.likelihoods[feature][feature_value + '_' + outcome] = count / outcome_count
+            for outcome in np.unique(self.y_train):
+                self.likelihoods[feature][outcome]['mean'] = self.X_train[feature][self.y_train[self.y_train == outcome].index.values.tolist()].mean()
+                self.likelihoods[feature][outcome]['var'] = self.X_train[feature][self.y_train[self.y_train == outcome].index.values.tolist()].var()
 
 
     def _calc_predictor_prior(self):
@@ -71,16 +64,18 @@ class NaiveBayes:
 
         for query in X:
             probabilities_outcome = {}
+
             for outcome in np.unique(self.y_train):
                 prior = self.class_priors[outcome]
                 likelihood = 1
                 evidence = 1
 
                 for feat, feature_value in zip(self.features, query):
-                    likelihood *= self.likelihoods[feat][feature_value]
-                    evidence *= self.pred_priors[feat][feature_value]
+                    mean = self.likelihoods[feat][outcome]['mean']
+                    var = self.likelihoods[feat][outcome]['var']
+                    likelihood *= (1 / np.sqrt(2 * np.pi * var)) * np.exp(-(feature_value - mean) ** 2 / (2 * var))
 
-                posterior = (likelihood * prior) / evidence
+                posterior = (likelihood * prior)
                 probabilities_outcome[outcome] = posterior
 
             result = max(probabilities_outcome, key = lambda x: probabilities_outcome[x])
@@ -91,7 +86,7 @@ class NaiveBayes:
 
     # calculate accuracy of algorithm compared to known results
     def accuracy(self, y_true, y_pred):
-        return float(sum(y_pred == y_true))/float(len(y_true)) * 100
+        return float(sum(y_pred == y_true)/(len(y_true)) * 100)
 
 
     # calculate precision score
@@ -106,4 +101,4 @@ class NaiveBayes:
 
     # calculate f1 score
     def f1_score(self, y_true, y_pred):
-        return float(2 * ((self.precision(y_true, y_pred) * self.recall(y_true, y_pred)) / (self.precision(y_true, y_pred) + self.recall(y_true, y_pred))))
+        return float(2 * ((self.precision(y_true, y_pred) * self.recall(y_true, y_pred)) / (self.precision(y_true, y_pred) + self.recall(y_true, y_pred))) * 100)

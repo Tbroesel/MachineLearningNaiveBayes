@@ -5,7 +5,20 @@ import math
 
 class processData:
 
-    def preProcess(dat):
+    def trainPreProcess(dat):
+
+        X = dat.drop([dat.columns[-1]], axis = 1)
+        y = dat[dat.columns[-1]]
+
+        # split this data set up and add noise
+        X.drop(X.columns[0], axis = 1, inplace = True)
+
+        print(X)
+
+        return X, y
+
+
+    def testPreProcess(dat):
 
         X = dat.drop([dat.columns[-1]], axis = 1)
         y = dat[dat.columns[-1]]

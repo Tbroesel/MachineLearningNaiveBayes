@@ -1,7 +1,6 @@
 
 
 import pandas as pd
-import NaiveBayes
 import NaiveBayes as nb
 from DataPreProcessing import processData
 
@@ -14,19 +13,20 @@ fileLocationInput = input(R"Enter File Location of Data: ")
 
 
 # get raw data from dataset
-dataRaw = pd.read_table(fileLocationInput)
-
+dataRaw = pd.read_csv(fileLocationInput)
+#print(dataRaw)
 
 # create training data set with subset of dataRaw
 
 
-
 # process training data
-X, y = processData.preProcess(dataRaw)
+X, y = processData.trainPreProcess(dataRaw)
 
 
 # fit training data
 Naive.fit(X, y)
+
+X, y = processData.testPreProcess(dataRaw)
 
 
 # check accuracy of fit
