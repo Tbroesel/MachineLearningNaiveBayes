@@ -1,6 +1,7 @@
 
 
 import numpy as np
+import pandas as pd
 
 
 class NaiveBayes:
@@ -20,6 +21,9 @@ class NaiveBayes:
 
 
     def fit(self, X, y):
+
+        X = X.apply(pd.to_numeric, errors='coerce')
+
         self.features = list(X.columns)
         self.X_train = X
         self.y_train = y
@@ -45,10 +49,22 @@ class NaiveBayes:
 
     def _calc_likelihoods(self):
         for feature in self.features:
-
             for outcome in np.unique(self.y_train):
-                self.likelihoods[feature][outcome]['mean'] = self.X_train[feature][self.y_train[self.y_train == outcome].index.values.tolist()].mean()
-                self.likelihoods[feature][outcome]['var'] = self.X_train[feature][self.y_train[self.y_train == outcome].index.values.tolist()].var()
+                # Get the indices where the outcome matches
+                outcome_indices = self.y_train[self.y_train == outcome].index.values.tolist()
+
+                # Extract the corresponding feature values for these indices
+                feature_values = self.X_train.loc[outcome_indices, feature]
+
+                # Check if the feature values are numeric and don't contain any NaNs
+                if not np.issubdtype(feature_values.dtype, np.number):
+                    raise ValueError(f"Feature {feature} contains non-numeric data.")
+                if feature_values.isna().sum() > 0:
+                    raise ValueError(f"Feature {feature} contains NaN values.")
+
+                # Calculate mean and variance
+                self.likelihoods[feature][outcome]['mean'] = feature_values.mean()
+                self.likelihoods[feature][outcome]['var'] = feature_values.var()
 
 
     def _calc_predictor_prior(self):
@@ -60,9 +76,12 @@ class NaiveBayes:
 
     def predict(self, X):
         results = []
-        X = np.array(X)
 
-        for query in X:
+        X = pd.DataFrame(X).apply(pd.to_numeric, errors='coerce')
+
+        epsilon = 1e-6
+
+        for _, query in X.iterrows():
             probabilities_outcome = {}
 
             for outcome in np.unique(self.y_train):
@@ -72,7 +91,7 @@ class NaiveBayes:
 
                 for feat, feature_value in zip(self.features, query):
                     mean = self.likelihoods[feat][outcome]['mean']
-                    var = self.likelihoods[feat][outcome]['var']
+                    var = self.likelihoods[feat][outcome]['var'] + epsilon
                     likelihood *= (1 / np.sqrt(2 * np.pi * var)) * np.exp(-(feature_value - mean) ** 2 / (2 * var))
 
                 posterior = (likelihood * prior)

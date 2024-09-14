@@ -10,11 +10,13 @@ class processData:
 
         X = pd.DataFrame(dat)
 
-        X.replace(0.00, 1, inplace = True)          # replace 0 values
-        X.replace(0, 1, inplace = True)             # replace 0 values
-        X.replace('?', 1, inplace = True)             # replace 0 values
-        X.replace('y', 1, inplace = True)             # replace y values
-        X.replace('n', 0, inplace = True)             # replace n values
+        pd.set_option('future.no_silent_downcasting', True)
+
+        X.replace(0.00, float(1), inplace = True)         # replace 0 values
+        X.replace(0, float(1), inplace = True)            # replace 0 values
+        X.replace('?', float(1), inplace = True)          # replace 0 values
+        X.replace('y', float(1), inplace = True)          # replace y values
+        X.replace('n', float(0), inplace = True)          # replace n values
         X.replace('democrat', 1, inplace = True)    # replace dem values
         X.replace('republican', 0, inplace = True)  # replace rep values
         X = X.sample(frac = 1)                                      # shuffle the data
@@ -23,8 +25,7 @@ class processData:
         y = X[X.columns[-1]]                                        # move labels to y
         X.drop([X.columns[-1]], axis = 1, inplace = True)     # remove labels from X
 
-
-        print(X)
+        #print(X)
 
         return X, y
 
