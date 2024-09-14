@@ -42,14 +42,19 @@ class NaiveBayes:
 
 
     def _calc_class_prior(self):
+
         for outcome in np.unique(self.y_train):
+
             outcome_count = sum(self.y_train == outcome)
             self.class_priors[outcome] = outcome_count / self.train_size
 
 
     def _calc_likelihoods(self):
+
         for feature in self.features:
+
             for outcome in np.unique(self.y_train):
+
                 # Get the indices where the outcome matches
                 outcome_indices = self.y_train[self.y_train == outcome].index.values.tolist()
 
@@ -68,13 +73,16 @@ class NaiveBayes:
 
 
     def _calc_predictor_prior(self):
+
         for feature in self.features:
             feature_values = self.X_train[feature].value_counts().to_dict()
+
             for feature_value, count in feature_values.items():
                 self.pred_priors[feature][feature_value] = count / self.train_size
 
 
     def predict(self, X):
+
         results = []
 
         X = pd.DataFrame(X).apply(pd.to_numeric, errors='coerce')
