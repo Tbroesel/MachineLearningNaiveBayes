@@ -22,6 +22,7 @@ X, y = processData.trainPreProcess(dataRaw)
 # fit training data
 Naive.fit(X, y)
 
+
 # process test data
 X, y = processData.testPreProcess(dataRaw)
 
