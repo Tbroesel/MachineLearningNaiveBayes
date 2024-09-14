@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 class NaiveBayes:
@@ -113,6 +114,13 @@ class NaiveBayes:
 
     # calculate accuracy of algorithm compared to known results
     def accuracy(self, y_true, y_pred):
+        print(y_true)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print(y_pred)
+        plt.figure("Pred")
+        plt.hist(y_pred,)
+        plt.figure("Truth")
+        plt.hist(y_true,  color="red")
         return float(sum(y_pred == y_true)/(len(y_true)) * 100)
 
 
